@@ -16,7 +16,7 @@ import LoadingIcon from "./LoadingIcon";
 class SideDrawer extends Component {
   componentDidUpdate() {
     if (!this.props.isLoading && !this.props.isLoggedIn) {
-      // this.props.navigation.navigate("Auth");
+      this.props.navigation.navigate("Auth");
     }
   }
   logout = () => {

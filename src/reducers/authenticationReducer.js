@@ -18,11 +18,12 @@ const defaultState = {
     isLoggedIn: false,
     email: '',
     isLoading: true,
+    isResetLoading: false,
     hasError: false,
     errorMessage: '',
 };
 
-export default function authenticationReducer(state = defaultState, action) {
+const authenticationReducer = (state = defaultState, action) => {
     switch (action.type) {
         case LOGIN_PENDING:
             return Object.assign({}, state, {
@@ -103,3 +104,5 @@ export default function authenticationReducer(state = defaultState, action) {
             return state;
     }
 }
+
+export default authenticationReducer;

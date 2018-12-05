@@ -24,14 +24,11 @@ class NetworkMonitor extends Component {
     );
   }
   render() {
-    if (!this.state.isConnected) {
       return (
-        <View style={styles.offlineContainer}>
+        !this.state.isConnected && <View style={styles.offlineContainer}>
           <Text style={styles.offlineText}>No Internet Connection</Text>
         </View>
       );
-    }
-    return null;
   }
 }
 

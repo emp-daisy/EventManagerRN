@@ -14,14 +14,14 @@ class ResetPassword extends Component {
     };
   }
 
-  componentDidUpdate() {
-    if (this.props.hasError && !this.props.isLoading) {
+  componentDidUpdate(prevProps) {
+    if (prevProps.isLoading && this.props.hasError && !this.props.isLoading) {
       Alert.alert("Error", this.props.errorMessage);
     }
-    if (!this.props.hasError && !this.props.isLoading) {
-      // Alert.alert("Success", 'Check email for details', [
-      //   {text: 'Login', onPress: () => this.props.navigation.navigate("Auth")}
-      // ]);
+    if (prevProps.isLoading && !this.props.hasError && !this.props.isLoading) {
+      Alert.alert("Success", 'Check email for details', [
+        {text: 'Login', onPress: () => this.props.navigation.navigate("Auth")}
+      ]);
     }
   }
 
@@ -89,7 +89,7 @@ class ResetPassword extends Component {
 
 const mapStateToProps = (state, _props) => {
   return {
-    isLoading: state.authentication.isLoading,
+    isLoading: state.authentication.isResetLoading,
     hasError: state.authentication.hasError,
     errorMessage: state.authentication.errorMessage,
   };

@@ -5,6 +5,7 @@ const variables = {
   // GENERAL
   appContainerColor: '#5f2c82',
   appImageColor: 'rgba(0,255,255,0.3)',
+  appGrey: '#343a40',
   transparent: 'rgba(0, 0, 0, 0)',
   linearBackground: ['#4b4646', '#5f2c82', '#141414'],
   loadingIconBg: '#c0c0c0',

@@ -15,6 +15,8 @@ import Centers from "./Centers";
 import ApplicationLoading from "./ApplicationLoading";
 import variables from "../assets/styles/variable";
 import SideDrawer from './SideDrawer';
+import CenterDetails from './CenterDetails';
+import CenterForm from './CenterForm';
 
 YellowBox.ignoreWarnings(['RCTBridge', 'relay:check']);
 
@@ -32,9 +34,23 @@ const AppDrawer = createDrawerNavigator({
       title: 'Centers',
       drawerLabel: 'Centers',
     }
+  },
+  MyEvents: {
+    screen: Centers,
+    navigationOptions: {
+      title: 'My events',
+      drawerLabel: 'My Events',
+    }
+  },
+  Profile: {
+    screen: Centers,
+    navigationOptions: {
+      title: 'Profile',
+      drawerLabel: 'Profile',
+    }
   }
 }, {
-  initialRouteName: "Events",
+  initialRouteName: "Centers",
   contentComponent: SideDrawer,
   contentOptions: {
     activeTintColor: '#ffffff',
@@ -68,6 +84,8 @@ const AppDrawer = createDrawerNavigator({
       color: '#000000'
     },
     title: 'Event Manager',
+
+    headerBackTitle: null,
     headerLeft: < DrawerIcon navigation = {
       navigation
     }
@@ -78,8 +96,18 @@ const AppDrawer = createDrawerNavigator({
 const AppStack = createStackNavigator({
   AppDrawer: {
     screen: AppDrawer,
+  },
+  CenterDetails: {
+    screen: CenterDetails,
+  },
+  CenterForm: {
+    screen: CenterForm,
   }
-}, {});
+}, {
+  navigationOptions:{
+    headerBackTitle: null
+  }
+});
 
 const AuthStack = createStackNavigator(
   {

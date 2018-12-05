@@ -1,9 +1,13 @@
 import { compose, combineReducers, createStore, applyMiddleware } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import authenticationReducer from './authenticationReducer';
+import centerReducer from './centerReducer';
+import eventReducer from './eventReducer';
 
 const reducers = combineReducers({
-  authentication: authenticationReducer
+  authentication: authenticationReducer,
+  center: centerReducer,
+  event: eventReducer,
 });
 
 // eslint-disable-next-line no-underscore-dangle
