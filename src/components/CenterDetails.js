@@ -1,34 +1,60 @@
 import React, { Component } from "react";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
-import { View, Image, Text, StyleSheet } from "react-native";
+import Icon from "react-native-vector-icons/FontAwesome";
+import { View, Image, TouchableOpacity, Text, StyleSheet } from "react-native";
 import { getCenters } from "../actions/center";
-import LoadingIcon from "./LoadingIcon";
 import ErrorBlock from "./ErrorBlock";
 import { DUMMY_IMG } from "../actions/_constants";
+import variables from "../assets/styles/variable";
 
 class CenterDetails extends Component {
   state = {
+    centerId: undefined,
     viewDetails: false,
-    centerData: {},
+    center: undefined,
   };
 
   componentDidMount() {
-    this.props.getCenters();
+    this.setState({
+      center:this.props.navigation.state.params.center,
+      centerId:this.props.navigation.state.params.center.id
+    });
   }
+
+  loadData = () => {
+    const center = this.props.allCenterList.filter(center => {
+        return center.id.toString()  === this.state.centerId.toString() ;
+      })[0];
+      console.log('REVIEWINFF', center);
+    this.setState({ center });
+  }
+
   render() {
-    const { center } = this.props.navigation.state.params;
+    const { center } = this.state;
     return (
-      <View style={styles.container}>
-      <Image source={{uri: center.image || DUMMY_IMG}}
-       style={{width: 400, height: 400, resizeMode: 'cover',}} />
+      center !== undefined && <View style={styles.container}>
+          <Image source={{uri: center.image || DUMMY_IMG}}
+        style={{width: 400, height: 400, resizeMode: 'cover',}} />
 
-        <Text style={styles.pageTitle}>{center.name}</Text>
+          <Text style={styles.pageTitle}>{center.name}</Text>
 
-        <Text style={styles.centerLocation}>{center.location}, {center.state}</Text>
+          <Text style={styles.centerLocation}>{center.location}, {center.state}</Text>
 
-        <Text style={styles.centerFacilities}>{center.facilities.toString()}</Text>
+          <Text style={styles.centerFacilities}>{center.facilities.toString()}</Text>
 
+          <TouchableOpacity
+            style={variables.floatingBtn}
+            onPress={() => {
+              this.props.navigation.navigate("CenterForm", {
+                edit: true,
+                center,
+                refresh: () => this.loadData()
+              })
+            }}
+          >
+            <Icon name="pencil" size={30} color={variables.appGrey} />
+          </TouchableOpacity>
         <ErrorBlock isVisible={this.props.hasError} message={this.props.errorMessage} />
       </View>
     );

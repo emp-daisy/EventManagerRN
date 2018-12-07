@@ -24,7 +24,20 @@ const variables = {
   primaryButtonClicked: '#c0c0c0',
   inputBoxColor: '#000000',
   inputBoxRadius: 10,
-  inputTextColor: '#ffffff'
+  inputTextColor: '#ffffff',
+  floatingBtn: {
+    borderWidth: 5,
+    borderColor: "rgba(0,0,0,0.2)",
+    alignItems: "center",
+    justifyContent: "center",
+    width: 70,
+    position: "absolute",
+    bottom: 10,
+    right: 10,
+    height: 70,
+    backgroundColor: "#ffffff",
+    borderRadius: 100
+  }
 };
 
 export default variables;

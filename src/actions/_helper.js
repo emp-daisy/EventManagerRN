@@ -5,17 +5,24 @@ import {
   ERROR_MESSAGE, AUTH_TOKEN
 } from "./_constants";
 
-const errorMessage = (errorObj) => {
-  if (typeof errorObj === "undefined") {
-    return ERROR_MESSAGE;
-  }
-  return errorObj;
-}
+const getErrorMessage = (errorObject) => {
+  let message, validationError;
 
-const validationResult = (error) => {
-  return Object
-    .values(error)
-    .join('\n');
+  if (typeof errorObject === "undefined") {
+    message =  ERROR_MESSAGE;
+  }
+  else if(errorObject &&  typeof errorObject.data.msg === 'object'){
+    message = "Validation failed";
+    validationError = Object.values(errorObject.data.msg).join('\n');
+  }
+  else{
+    message = errorObject.data.msg;
+  }
+
+  return {
+    message,
+    validationError,
+  };
 }
 
 const getUserToken = async () => {
@@ -37,6 +44,5 @@ export {
   getUserToken,
   addUserToken,
   removeUserToken,
-  errorMessage,
-  validationResult
+  getErrorMessage,
 };

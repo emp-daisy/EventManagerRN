@@ -23,24 +23,34 @@ import { DUMMY_IMG } from "../actions/_constants";
 
 class CenterForm extends Component {
   state = {
+    isEditing: false,
     facility: "",
-    imageUri: "",
     center: {
-      name: "Test IOS Center 2.0",
-      description: "Created from IOS",
-      location: "From my simulator",
-      state: 25,
-      facilities: ["foo", "bar"],
+      name: "",
+      description: "",
+      location: "",
+      state: undefined,
+      facilities: [],
+      imageUri: "",
       image: ""
     }
   };
 
+  componentDidMount() {
+   if(this.props.navigation.state.params.edit){
+      this.setState({
+        isEditing: this.props.navigation.state.params.edit,
+        center: {...this.props.navigation.state.params.center, state: this.props.navigation.state.params.center.state.id},
+      });
+    }
+  }
+
   componentDidUpdate(prevProps) {
     if (prevProps.isLoading && this.props.hasError && !this.props.isLoading) {
-      Alert.alert("Error", `${this.props.errorMessage}\n${this.props.errorValidation}`);
+      Alert.alert("Error", `${this.props.errorMessage}\n${this.props.errorValidation||''}`);
     }
     if (prevProps.isLoading && !this.props.hasError && !this.props.isLoading) {
-      Alert.alert("Success", 'Center added sucessfully', [
+      Alert.alert("Success", `Center ${(this.state.isEditing) ? 'updated' : 'added'} sucessfully`, [
         {text: 'Ok', onPress: () => {
           this.props.navigation.state.params.refresh();
           this.props.navigation.goBack(null);
@@ -59,15 +69,32 @@ class CenterForm extends Component {
         if (!res.didCancel && !res.error) {
           this.setState({
             imageUri: res.uri,
-            center: { ...this.state.center, image: `data:image/png;base64,${res.data}` }
+            center: { ...this.state.center, imageUri: `data:image/png;base64,${res.data}` }
           });
         }
       }
     );
   };
 
+  removeImage =()=>{
+    if (this.state.center.imageUri !== "") {
+      this.setState({
+        center: { ...this.state.center, imageUri: "" }
+      });
+    }
+    else if (this.state.center.image !== "") {
+      this.setState({
+        center: { ...this.state.center, image: "" }
+      });
+    }
+  }
+
   onCreate = () => {
     this.props.createCenter(this.state.center);
+  };
+
+  onUpdate = () => {
+    this.props.updateCenter(this.state.center.id, this.state.center);
   };
 
   checkFormInvalid = () => {
@@ -86,7 +113,7 @@ class CenterForm extends Component {
         contentContainerStyle={styles.contentContainer}
       >
         <Text style={styles.pageTitle}>
-          {this.props.edit ? "Update" : "Add"} Center
+          {this.state.isEditing ? "Update" : "Add"} Center
         </Text>
         <TextInput
           placeholder="Center name"
@@ -101,21 +128,15 @@ class CenterForm extends Component {
         <ImageBackground
           source={{
             uri:
-              this.state.imageUri || DUMMY_IMG
+            this.state.center.imageUri || this.state.center.image || DUMMY_IMG
           }}
           style={styles.previewImage}
         >
           <View style={styles.imgButtons}>
             <TouchableOpacity
-              onPress={() => {
-                if (this.state.center.image !== "") {
-                  this.setState({
-                    center: { ...this.state.center, image: "" }
-                  });
-                }
-              }}
+              onPress={ this.removeImage }
             >
-              {this.state.center.image !== "" && (
+              {(this.state.center.image !== "" || this.state.center.imageUri !== "") && (
                 <Icon name="times-circle" size={20} color={variables.appGrey} />
               )}
             </TouchableOpacity>
@@ -134,7 +155,7 @@ class CenterForm extends Component {
           autoCorrect={false}
           multiline
           numberOfLines={4}
-          style={styles.inputBox}
+          style={[styles.inputBox, styles.multiLineBox]}
           value={this.state.center.description}
           onChangeText={text =>
             this.setState({
@@ -148,7 +169,7 @@ class CenterForm extends Component {
           autoCorrect={false}
           multiline
           numberOfLines={4}
-          style={styles.inputBox}
+          style={[styles.inputBox, styles.multiLineBox]}
           value={this.state.center.location}
           onChangeText={text =>
             this.setState({
@@ -169,14 +190,16 @@ class CenterForm extends Component {
             })
           }
         }
-
-        dropdownOffset={{top:5, left: 0}}
         containerStyle={styles.selectBox}
-        inputContainerStyle={{ borderBottomColor: 'transparent' }}
-        // overlayStyle={}
-        // pickerStyle={}
+        inputContainerStyle={styles.dropdownContainer}
+        overlayStyle={styles.dropdownPickerOverlay}
+        itemTextStyle={styles.dropdownItemTextStyle}
         rippleInsets={{top: 6, bottom: -8}}
         rippleCentered={true}
+        dropdownMargins={{ min: 40, max: 45 }}
+        dropdownOffset={{left:0, top: 10}}
+        dropdownPosition={0}
+        itemCount={5}
       />
         <TextInput
           placeholder="Enter facilities"
@@ -200,7 +223,8 @@ class CenterForm extends Component {
           value={this.state.facility}
           onChangeText={text => this.setState({ facility: text.trim() })}
         />
-        <View style={styles.facilitiesList}>
+       {this.state.center.facilities !== undefined &&
+         <View style={styles.facilitiesList}>
           {this.state.center.facilities.map((facility, index) => {
             return (
               <View key={index.toString()} style={styles.pillView}>
@@ -226,7 +250,7 @@ class CenterForm extends Component {
               </View>
             );
           })}
-        </View>
+        </View>}
 
         <View style={styles.buttonsGroup}>
           <TouchableHighlight
@@ -234,11 +258,11 @@ class CenterForm extends Component {
             style={[styles.button, isFormInvalid && styles.disabledButton]}
             disabled={isFormInvalid}
             onPress={() => {
-              this.onCreate();
+              (this.state.isEditing) ? this.onUpdate() : this.onCreate();
             }}
           >
             <Text style={styles.buttonText}>
-              {this.props.edit ? "Update" : "Add"} Center
+              {this.state.isEditing ? "Update" : "Add"} Center
             </Text>
           </TouchableHighlight>
         </View>
@@ -276,8 +300,6 @@ const styles = StyleSheet.create({
     backgroundColor: variables.appGrey
   },
   contentContainer: {
-    // flexGrow: 1,
-    // flex: 1,
     paddingBottom: 40,
     alignContent: "center",
     alignItems: "center"
@@ -319,6 +341,13 @@ const styles = StyleSheet.create({
     ...Platform.select({
       ios: {
         minHeight: 50,
+      }
+    })
+  },
+  multiLineBox:{
+    ...Platform.select({
+      ios: {
+        minHeight: 150,
         paddingTop: 15,
       }
     })
@@ -385,6 +414,13 @@ const styles = StyleSheet.create({
   disabledButton: {
     opacity: 0.5,
     borderWidth: 0
+  },
+  dropdownContainer: { borderBottomColor: 'transparent' },
+  dropdownPickerOverlay: {
+    marginTop: 30,
+  },
+  dropdownItemTextStyle: {
+    fontSize: 15,
   }
 });
 

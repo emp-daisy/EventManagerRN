@@ -25,18 +25,17 @@ import {
 } from "./_types";
 import axios from "axios";
 import {
-  errorMessage, getUserToken, validationResult
+  getErrorMessage, getUserToken
 } from "./_helper";
 
 const uploadToCloudinary = (file) => {
   const formData = new FormData();
   formData.append('file', file);
   formData.append('upload_preset', CLOUDINARY_PRESET);
-
   return axios
     .post(CLOUDINARY_API, formData)
     .then(response => response.data.secure_url )
-    .catch((error) => error.response);
+    .catch(() => '');
 };
 
 const getCenters = () => dispatch => {
@@ -86,10 +85,9 @@ const createCenter = (centerData) => async dispatch => {
     type: CREATE_CENTERS_PENDING
   });
 
-  const imageUrl = (centerData.image!=="") ? await uploadToCloudinary(centerData.image) : null;
-
-  console.log('ImageURL***', imageUrl);
+  const imageUrl = (centerData.imageUri !== "") ? await uploadToCloudinary(centerData.imageUri) : centerData.image;
   const token = await getUserToken();
+
   axios
     .post(`${API_URL}/centers`, {
       ...centerData,
@@ -103,44 +101,44 @@ const createCenter = (centerData) => async dispatch => {
       });
     })
     .catch(error => {
-      let message;
-      let validationError;
-      if(error.response &&  typeof error.response.data.msg === 'object'){
-        message = "Validation failed";
-        validationError = validationResult(error.response.data.msg);
-      }
-      else{
-        message = errorMessage(error.response && error.response.data.msg);
-      }
+      const errorMessage = getErrorMessage(error.response);
 
       dispatch({
         type: CREATE_CENTERS_ERROR,
-        message,
-        validationError
+        ...errorMessage,
       });
     });
 };
 
-const updateCenter = (id, newCenterData) => dispatch => {
+const updateCenter = (id, newCenterData) => async (dispatch) => {
   dispatch({
     type: UPDATE_CENTERS_PENDING
   });
 
+  const imageUrl = (newCenterData.imageUri !== "" && newCenterData.imageUri !== undefined) ? await uploadToCloudinary(newCenterData.imageUri) : newCenterData.image;
   const token = await getUserToken();
+
   axios
     .put(`${API_URL}/centers/${id}`, {
-      newCenterData,
+      ...newCenterData,
+      facilities: newCenterData.facilities.join(),
+      image: imageUrl,
       token
     })
     .then(response => {
+      console.log('Got here', response.data);
       dispatch({
         type: UPDATE_CENTERS_SUCCESS,
+        newData: response.data.val
       });
     })
     .catch(error => {
+      console.log(error.response, '>>>>>>', imageUrl);
+      const errorMessage = getErrorMessage(error.response);
+
       dispatch({
         type: UPDATE_CENTERS_ERROR,
-        message: errorMessage(error.response && error.response.data.msg)
+        ...errorMessage
       });
     });
 };

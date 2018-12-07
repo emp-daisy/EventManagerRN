@@ -110,12 +110,12 @@ const centerReducer = (state = defaultState, action) => {
       });
     case UPDATE_CENTERS_PENDING:
       return Object.assign({}, state, {
-        isLoading: true,
+        isCreating: true,
         hasError: false
       });
     case UPDATE_CENTERS_SUCCESS:
       return Object.assign({}, state, {
-        isLoading: false,
+        isCreating: false,
         hasError: false,
         allCenterList: state.allCenterList.map((item) => {
           if (item.id === action.newData.id) {
@@ -129,9 +129,10 @@ const centerReducer = (state = defaultState, action) => {
       });
     case UPDATE_CENTERS_ERROR:
       return Object.assign({}, state, {
-        isLoading: false,
+        isCreating: false,
         hasError: true,
-        errorMessage: action.message
+        errorMessage: action.message,
+        errorValidation: action.validationError
       });
     case GET_STATES_SUCCESS:
     return Object.assign({}, state, {
