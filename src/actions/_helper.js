@@ -11,6 +11,9 @@ const getErrorMessage = (errorObject) => {
   if (typeof errorObject === "undefined") {
     message =  ERROR_MESSAGE;
   }
+  else if (typeof errorObject.data === "string") {
+    message = errorObject.data;
+  }
   else if(errorObject &&  typeof errorObject.data.msg === 'object'){
     message = "Validation failed";
     validationError = Object.values(errorObject.data.msg).join('\n');

@@ -2,13 +2,29 @@ import React, { Component } from "react";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { View, Image, TouchableOpacity, Text, StyleSheet } from "react-native";
-import { getCenters } from "../actions/center";
+import { View, Image, TouchableOpacity, Text, StyleSheet, Alert } from "react-native";
+import { getCenters, deleteCenter, resetCenterStore } from "../actions/center";
 import ErrorBlock from "./ErrorBlock";
 import { DUMMY_IMG } from "../actions/_constants";
 import variables from "../assets/styles/variable";
+import LoadingIcon from "./LoadingIcon";
 
 class CenterDetails extends Component {
+  static navigationOptions = ({ navigation }) => {
+    return {
+      headerRight: (
+        <TouchableOpacity
+            style={{marginHorizontal: 10,}}
+            onPress={() => {
+              navigation.state.params.deleteCenter()
+            }}
+          >
+            <Icon name="trash" size={30} color={variables.appGrey} />
+          </TouchableOpacity>
+      ),
+    };
+  };
+
   state = {
     centerId: undefined,
     viewDetails: false,
@@ -20,14 +36,34 @@ class CenterDetails extends Component {
       center:this.props.navigation.state.params.center,
       centerId:this.props.navigation.state.params.center.id
     });
+
+    this.props.navigation.setParams({
+      deleteCenter: this.deleteCenter
+      });
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.isLoading && prevProps.allCenterList !== this.props.allCenterList && !this.props.isLoading) {
+      this.props.navigation.goBack(null);
+    }
+  }
+
+  componentWillUnmount () {
+    this.props.resetCenterStore();
   }
 
   loadData = () => {
     const center = this.props.allCenterList.filter(center => {
         return center.id.toString()  === this.state.centerId.toString() ;
       })[0];
-      console.log('REVIEWINFF', center);
     this.setState({ center });
+  }
+
+  deleteCenter = () => {
+    Alert.alert("Confirmation", "Sure you want this center?", [
+      {text: 'Yes', onPress: () => {this.props.deleteCenter(this.state.centerId);}},
+      {text: 'No', onPress: () => {}},
+    ]);
   }
 
   render() {
@@ -56,6 +92,8 @@ class CenterDetails extends Component {
             <Icon name="pencil" size={30} color={variables.appGrey} />
           </TouchableOpacity>
         <ErrorBlock isVisible={this.props.hasError} message={this.props.errorMessage} />
+
+        <LoadingIcon loading={this.props.isLoading} />
       </View>
     );
   }
@@ -74,6 +112,8 @@ const mapDispatchToProps = dispatch => {
   return bindActionCreators(
     {
       getCenters,
+      deleteCenter,
+      resetCenterStore
     },
     dispatch
   );

@@ -13,7 +13,8 @@ import {
   DELETE_EVENTS_PENDING,
   GET_USER_EVENTS_PENDING,
   GET_USER_EVENTS_SUCCESS,
-  GET_USER_EVENTS_ERROR
+  GET_USER_EVENTS_ERROR,
+  RESET_EVENT_STATES
 } from "../actions/_types";
 
 const defaultState = {
@@ -109,10 +110,8 @@ const eventReducer = (state = defaultState, action) => {
         error: false,
         eventList: Object.assign({}, state.eventList, {
           centers: state.eventList.centers.map((item) => {
-            if (item.id === action.newData.id) {
-              return Object.assign({}, item, action.newData);
-            }
-            return item;
+            return (item.id === action.newData.id) ?
+             Object.assign({}, item, action.newData) : item;
           })
         })
       });
@@ -121,6 +120,13 @@ const eventReducer = (state = defaultState, action) => {
         isLoading: false,
         error: true,
         errorMessage: action.msg
+      });
+      case RESET_EVENT_STATES:
+      return Object.assign({}, state, {
+        isLoading: false,
+        hasError: false,
+        success: false,
+        isCreating: false,
       });
     default:
       return state;

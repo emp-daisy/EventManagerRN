@@ -16,7 +16,7 @@ import {
   ImageBackground
 } from "react-native";
 import ImagePicker from "react-native-image-picker";
-import { updateCenter, createCenter } from "../actions/center";
+import { updateCenter, createCenter, resetCenterStore } from "../actions/center";
 import variables from "../assets/styles/variable";
 import LoadingIcon from "./LoadingIcon";
 import { DUMMY_IMG } from "../actions/_constants";
@@ -43,6 +43,10 @@ class CenterForm extends Component {
         center: {...this.props.navigation.state.params.center, state: this.props.navigation.state.params.center.state.id},
       });
     }
+  }
+
+  componentWillUnmount () {
+    this.props.resetCenterStore();
   }
 
   componentDidUpdate(prevProps) {
@@ -98,15 +102,16 @@ class CenterForm extends Component {
   };
 
   checkFormInvalid = () => {
-    const { email } = this.state;
+    const { name, location, state } = this.state.center;
     return (
-      email.length === 0 ||
-      !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)
-    ); // eslint-disable-line no-useless-escape
+      name.length === 0 ||
+      location.length === 0 ||
+      state === undefined
+    );
   };
 
   render() {
-    const isFormInvalid = false; //this.checkFormInvalid();
+    const isFormInvalid = this.checkFormInvalid();
     return (
       <ScrollView
         style={styles.contentBg}
@@ -287,7 +292,8 @@ const mapDispatchToProps = dispatch => {
   return bindActionCreators(
     {
       createCenter,
-      updateCenter
+      updateCenter,
+      resetCenterStore
     },
     dispatch
   );

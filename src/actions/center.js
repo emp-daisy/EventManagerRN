@@ -21,7 +21,8 @@ import {
   GET_SINGLE_CENTERS_ERROR,
   GET_STATES_SUCCESS,
   GET_STATES_PENDING,
-  GET_STATES_ERROR
+  GET_STATES_ERROR,
+  RESET_CENTER_STATES
 } from "./_types";
 import axios from "axios";
 import {
@@ -126,14 +127,12 @@ const updateCenter = (id, newCenterData) => async (dispatch) => {
       token
     })
     .then(response => {
-      console.log('Got here', response.data);
       dispatch({
         type: UPDATE_CENTERS_SUCCESS,
         newData: response.data.val
       });
     })
     .catch(error => {
-      console.log(error.response, '>>>>>>', imageUrl);
       const errorMessage = getErrorMessage(error.response);
 
       dispatch({
@@ -143,23 +142,27 @@ const updateCenter = (id, newCenterData) => async (dispatch) => {
     });
 };
 
-const deleteCenter = (id) => dispatch => {
+const deleteCenter = (id) => async(dispatch) => {
   dispatch({
     type: DELETE_CENTERS_PENDING
   });
 
   const token = await getUserToken();
   axios
-    .delete(`${API_URL}/centers/${id}`)
-    .then(response => {
+    .delete(`${API_URL}/centers/${id}`, {
+      data: {token}
+    })
+    .then(_response => {
       dispatch({
         type: DELETE_CENTERS_SUCCESS,
+        id
       });
     })
     .catch(error => {
+      const errorMessage = getErrorMessage(error.response);
       dispatch({
         type: DELETE_CENTERS_ERROR,
-        message: errorMessage(error.response && error.response.data.msg)
+        ...errorMessage
       });
     });
 };
@@ -184,11 +187,18 @@ const getStates = () => dispatch => {
     });
 };
 
+const resetCenterStore = () => dispatch => {
+  dispatch({
+    type: RESET_CENTER_STATES
+  });
+}
+
 export {
   getCenters,
   getSingleCenter,
   createCenter,
   deleteCenter,
   updateCenter,
-  getStates
+  getStates,
+  resetCenterStore
 };

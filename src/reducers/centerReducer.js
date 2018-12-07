@@ -14,7 +14,8 @@ import {
   GET_CENTERS_ERROR,
   GET_CENTERS_SUCCESS,
   GET_CENTERS_PENDING,
-  GET_STATES_SUCCESS
+  GET_STATES_SUCCESS,
+  RESET_CENTER_STATES
 } from "../actions/_types";
 
 const defaultState = {
@@ -118,10 +119,8 @@ const centerReducer = (state = defaultState, action) => {
         isCreating: false,
         hasError: false,
         allCenterList: state.allCenterList.map((item) => {
-          if (item.id === action.newData.id) {
-            return Object.assign({}, item, action.newData);
-          }
-          return item;
+          return (item.id === action.newData.id) ?
+             Object.assign({}, item, action.newData) : item;
         }),
         singleCenter: Object.assign({}, state.singleCenter, {
           center: action.newData
@@ -139,6 +138,13 @@ const centerReducer = (state = defaultState, action) => {
       isLoading: false,
       hasError: false,
       allStates: action.states,
+    });
+    case RESET_CENTER_STATES:
+    return Object.assign({}, state, {
+      isLoading: false,
+      hasError: false,
+      success: false,
+      isCreating: false,
     });
     default:
       return state;
