@@ -19,6 +19,7 @@ import {
 
 const defaultState = {
   isLoading: true,
+  isCreating: false,
   hasError: false,
   errorMessage: '',
   success: false,
@@ -32,93 +33,90 @@ const eventReducer = (state = defaultState, action) => {
     case GET_EVENTS_PENDING:
       return Object.assign({}, state, {
         isLoading: true,
-        error: false,
+        hasError: false,
         success: false,
       });
     case GET_EVENTS_SUCCESS:
       return Object.assign({}, state, {
         isLoading: false,
-        error: false,
+        hasError: false,
         eventList: action.data,
         pagination: action.metadata,
       });
     case GET_EVENTS_ERROR:
       return Object.assign({}, state, {
         isLoading: false,
-        error: true,
+        hasError: true,
         errorMessage: action.msg
       });
     case GET_USER_EVENTS_PENDING:
       return Object.assign({}, state, {
         isLoading: true,
-        error: false
+        hasError: false
       });
     case GET_USER_EVENTS_SUCCESS:
       return Object.assign({}, state, {
         isLoading: false,
-        error: false,
-        eventList: action.data
+        hasError: false,
+        eventList: action.event
       });
     case GET_USER_EVENTS_ERROR:
       return Object.assign({}, state, {
         isLoading: false,
-        error: true,
+        hasError: true,
         errorMessage: action.msg
       });
     case DELETE_EVENTS_PENDING:
       return Object.assign({}, state, {
         isLoading: true,
-        error: false
+        hasError: false
       });
     case DELETE_EVENTS_SUCCESS:
       return Object.assign({}, state, {
         isLoading: false,
-        error: false,
-        // eventList: state.eventList.filter(el => el.id.toString() !== action.id.toString()),
+        hasError: false,
+        eventList: state.eventList.filter(el => el.id.toString() !== action.id.toString()),
       });
     case DELETE_EVENTS_ERROR:
       return Object.assign({}, state, {
         isLoading: false,
-        error: true,
+        hasError: true,
         errorMessage: action.msg
       });
     case CREATE_EVENTS_PENDING:
       return Object.assign({}, state, {
-        isLoading: true,
-        error: false
+        isCreating: true,
+        hasError: false
       });
     case CREATE_EVENTS_SUCCESS:
       return Object.assign({}, state, {
-        isLoading: false,
-        error: false,
-        eventList: [...state.eventList, action.newData],
+        isCreating: false,
+        hasError: false,
       });
     case CREATE_EVENTS_ERROR:
       return Object.assign({}, state, {
-        isLoading: false,
-        error: true,
+        isCreating: false,
+        hasError: true,
         errorMessage: action.msg
       });
     case UPDATE_EVENTS_PENDING:
       return Object.assign({}, state, {
-        isLoading: true,
-        error: false
+        isCreating: true,
+        hasError: false
       });
     case UPDATE_EVENTS_SUCCESS:
       return Object.assign({}, state, {
-        isLoading: false,
-        error: false,
-        eventList: Object.assign({}, state.eventList, {
-          centers: state.eventList.centers.map((item) => {
-            return (item.id === action.newData.id) ?
+        isCreating: false,
+        hasError: false,
+        eventList: state.eventList.map((item) => {
+          return (item.id === action.newData.id) ?
              Object.assign({}, item, action.newData) : item;
-          })
-        })
+        }),
       });
     case UPDATE_EVENTS_ERROR:
       return Object.assign({}, state, {
-        isLoading: false,
-        error: true,
+        isCreating: false,
+        hasError: true,
         errorMessage: action.msg
       });
       case RESET_EVENT_STATES:

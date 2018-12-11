@@ -61,5 +61,5 @@ export const GET_STATES_PENDING = 'get_states_pending';
 export const GET_STATES_SUCCESS = 'get_states_success';
 export const GET_STATES_ERROR = 'get_states_error';
 // RESET STORE STATE
-export const RESET_CENTER_STATES = 'get_center_states';
-export const RESET_EVENT_STATES = 'get_event_states';
+export const RESET_CENTER_STATES = 'reset_center_states';
+export const RESET_EVENT_STATES = 'reset_event_states';

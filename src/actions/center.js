@@ -54,9 +54,10 @@ const getCenters = () => dispatch => {
       });
     })
     .catch(error => {
+      const errorMessage = getErrorMessage(error.response);
       dispatch({
         type: GET_CENTERS_ERROR,
-        message: errorMessage(error.response && error.response.data.msg)
+        message: errorMessage
       });
     });
 };
@@ -74,9 +75,10 @@ const getSingleCenter = (id) => dispatch => {
       });
     })
     .catch(error => {
+      const errorMessage = getErrorMessage(error.response);
       dispatch({
         type: GET_SINGLE_CENTERS_ERROR,
-        message: errorMessage(error.response && error.response.data.msg)
+        message: errorMessage
       });
     });
 };

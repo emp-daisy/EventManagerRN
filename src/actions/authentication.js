@@ -1,4 +1,5 @@
 import axios from "axios";
+import jwt_decode from "jwt-decode";
 import {
   API_URL
 } from "./_constants";
@@ -31,8 +32,16 @@ const isUserAuthenticated = () => async dispatch => {
   try {
     const authenticated = await getUserToken();
     if (authenticated !== null) {
+      const { isAdmin, exp } = jwt_decode(authenticated);
+
+      const expiryDate = new Date(0).setUTCSeconds(exp);
+      if (new Date() > expiryDate) {
+        removeUserToken();
+        throw 'Expired token';
+      }
       dispatch({
-        type: AUTH_USER
+        type: AUTH_USER,
+        isAdmin
       });
     } else {
       throw "Unauthenticated";
@@ -56,15 +65,17 @@ const login = (email, password) => dispatch => {
     })
     .then(response => {
       addUserToken(response.data.token);
+      const { isAdmin } = jwt_decode(response.data.token);
       dispatch({
         type: LOGIN_SUCCESS,
-        email: email
+        email: email,
+        isAdmin
       });
     })
     .catch(error => {
       dispatch({
         type: LOGIN_ERROR,
-        message: errorMessage(error.response && error.response.data.msg)
+        message: errorMessage(error.response)
       });
     });
 };
@@ -98,7 +109,7 @@ const register = credentials => (dispatch) => {
     .catch(error => {
       dispatch({
         type: REGISTER_ERROR,
-        message: errorMessage(error.response && error.response.data.msg)
+        message: errorMessage(error.response)
       });
     });
 };
@@ -121,7 +132,7 @@ const forgottenPassword = email => (dispatch) => {
     .catch(error => {
       dispatch({
         type: FORGOT_PASSWORD_ERROR,
-        message: errorMessage(error.response && error.response.data.msg)
+        message: errorMessage(error.response)
       });
     });
 };

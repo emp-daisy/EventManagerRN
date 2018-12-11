@@ -13,6 +13,7 @@ class CenterDetails extends Component {
   static navigationOptions = ({ navigation }) => {
     return {
       headerRight: (
+        navigation.state.params.isRoleAdmin !== null &&
         <TouchableOpacity
             style={{marginHorizontal: 10,}}
             onPress={() => {
@@ -38,7 +39,8 @@ class CenterDetails extends Component {
     });
 
     this.props.navigation.setParams({
-      deleteCenter: this.deleteCenter
+      deleteCenter: this.deleteCenter,
+      isRoleAdmin: this.props.isRoleAdmin
       });
   }
 
@@ -60,7 +62,7 @@ class CenterDetails extends Component {
   }
 
   deleteCenter = () => {
-    Alert.alert("Confirmation", "Sure you want this center?", [
+    Alert.alert("Confirmation", "Sure you want to delete this center?", [
       {text: 'Yes', onPress: () => {this.props.deleteCenter(this.state.centerId);}},
       {text: 'No', onPress: () => {}},
     ]);
@@ -79,7 +81,7 @@ class CenterDetails extends Component {
 
           <Text style={styles.centerFacilities}>{center.facilities.toString()}</Text>
 
-          <TouchableOpacity
+          {this.props.isRoleAdmin!==null && <TouchableOpacity
             style={variables.floatingBtn}
             onPress={() => {
               this.props.navigation.navigate("CenterForm", {
@@ -90,8 +92,12 @@ class CenterDetails extends Component {
             }}
           >
             <Icon name="pencil" size={30} color={variables.appGrey} />
-          </TouchableOpacity>
-        <ErrorBlock isVisible={this.props.hasError} message={this.props.errorMessage} />
+          </TouchableOpacity>}
+        <ErrorBlock
+          isVisible={this.props.hasError}
+          message={this.props.errorMessage}
+          onRefresh={()=>this.loadData()}
+        />
 
         <LoadingIcon loading={this.props.isLoading} />
       </View>
@@ -105,6 +111,7 @@ const mapStateToProps = (state, _props) => {
     hasError: state.center.hasError,
     errorMessage: state.center.errorMessage,
     allCenterList: state.center.allCenterList,
+    isRoleAdmin: state.authentication.isRoleAdmin
   };
 };
 

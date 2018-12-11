@@ -30,7 +30,6 @@ class Centers extends Component {
     this.props.getStates();
   }
 
-  addCenterModal = () => {};
   render() {
     return (
       <View style={styles.container}>
@@ -70,7 +69,7 @@ class Centers extends Component {
             />
           </View>
         )}
-        <TouchableOpacity
+        {this.props.isRoleAdmin !== null && <TouchableOpacity
           style={styles.floatingBtn}
           onPress={() => {
             this.props.navigation.navigate("CenterForm", {
@@ -79,11 +78,12 @@ class Centers extends Component {
           }}
         >
           <Icon name="plus" size={30} color={variables.appGrey} />
-        </TouchableOpacity>
+        </TouchableOpacity>}
 
         <ErrorBlock
           isVisible={this.props.hasError}
           message={this.props.errorMessage}
+          onRefresh={()=>this.loadData()}
         />
       </View>
     );
@@ -95,7 +95,8 @@ const mapStateToProps = (state, _props) => {
     isLoading: state.center.isLoading,
     hasError: state.center.hasError,
     errorMessage: state.center.errorMessage,
-    allCenterList: state.center.allCenterList
+    allCenterList: state.center.allCenterList,
+    isRoleAdmin: state.authentication.isRoleAdmin
   };
 };
 

@@ -21,6 +21,7 @@ const defaultState = {
     isResetLoading: false,
     hasError: false,
     errorMessage: '',
+    isRoleAdmin: false
 };
 
 const authenticationReducer = (state = defaultState, action) => {
@@ -36,6 +37,7 @@ const authenticationReducer = (state = defaultState, action) => {
                 isLoggedIn: true,
                 email: action.email,
                 isLoading: false,
+                isRoleAdmin: action.isAdmin
             });
         case LOGIN_ERROR:
             return Object.assign({}, state, {
@@ -48,11 +50,13 @@ const authenticationReducer = (state = defaultState, action) => {
             return Object.assign({}, state, {
                 isLoggedIn: true,
                 isLoading: false,
+                isRoleAdmin: action.isAdmin
             });
             case UNAUTH_USER:
             return Object.assign({}, state, {
                 isLoggedIn: false,
                 isLoading: false,
+                isRoleAdmin: false,
             });
         case REGISTER_PENDING:
             return Object.assign({}, state, {
@@ -99,6 +103,7 @@ const authenticationReducer = (state = defaultState, action) => {
                 isLoggedIn: false,
                 email: '',
                 isLoading: false,
+                isRoleAdmin: null
             });
         default:
             return state;
